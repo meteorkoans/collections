@@ -15,4 +15,32 @@ if (Meteor.isClient) {
     }
   });
 
+  Template.person.helpers({
+    editing: function() {
+      return Session.get("edit-" + this._id);
+    }
+  });
+
+  Template.person.rendered = function() {
+    var input = this.find("input");
+    if (input) {
+      input.focus();
+    }
+  }
+
+  Template.person.events({
+    'click .name': function(e, t) {
+      Session.set("edit-" + t.data._id, true);
+    },
+    'keypress input': function(e, t) {
+      if (e.keyCode === 13)  {
+        People.update(this._id, { $set: { name: e.currentTarget.value }});
+        Session.set("edit-" + t.data._id, false);
+      }
+    },
+    'click .del': function(e, t) {
+      People.remove(this._id);
+    }
+  });
+
 }
